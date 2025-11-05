@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./DetailsPage.css";
 
 export default function DetailsPage() {
   const [details, setDetails] = useState({
@@ -11,167 +12,226 @@ export default function DetailsPage() {
     entertainmentExpenses: "",
     educationOrTraining: "",
     otherExpenses: "",
-    assets: [{ product: "", buyingPrice: "", yearsOld: "" }],
-    liabilities: [{ product: "", amount: "" }],
+    age: "",
+    shortTermGoals: "",
+    longTermGoals: "",
   });
+
+  const [assets, setAssets] = useState([]);
+  const [liabilities, setLiabilities] = useState([]);
+  const [asset, setAsset] = useState({ name: "", buyingPrice: "", yearsOld: "" });
+  const [liability, setLiability] = useState({ name: "", amount: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDetails({ ...details, [name]: value });
+    setDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  // handle change inside assets/liabilities
-  const handleNestedChange = (index, section, field, value) => {
-    const updated = [...details[section]];
-    updated[index][field] = value;
-    setDetails({ ...details, [section]: updated });
+  const handleAddAsset = () => {
+    if (asset.name && asset.buyingPrice) {
+      setAssets([...assets, asset]);
+      setAsset({ name: "", buyingPrice: "", yearsOld: "" });
+    }
   };
 
-  const addField = (section) => {
-    const newField =
-      section === "assets"
-        ? { product: "", buyingPrice: "", yearsOld: "" }
-        : { product: "", amount: "" };
-    setDetails({ ...details, [section]: [...details[section], newField] });
+  const handleAddLiability = () => {
+    if (liability.name && liability.amount) {
+      setLiabilities([...liabilities, liability]);
+      setLiability({ name: "", amount: "" });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("User Details:", details);
-    alert("Details Submitted Successfully!");
+    console.log("User Details", { ...details, assets, liabilities });
+    alert("Details Saved Successfully!");
   };
 
   return (
-    <section style={{ padding: "4rem 2rem", textAlign: "center" }}>
+    <section className="details-section">
       <h1>💼 Your Financial Details</h1>
-      <p style={{ color: "#b9bbbe" }}>
-        Let’s personalize your profile by breaking down your income, expenses, and holdings.
-      </p>
+      <p>Let’s personalize your profile with your income, expenses, and holdings.</p>
 
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          maxWidth: "800px",
-          margin: "2rem auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-          textAlign: "left",
-        }}
-      >
-        {/* ===== Income Section ===== */}
-        <h2>🏦 Income</h2>
-        <label>Primary Income (Salary / Business)</label>
-        <input type="number" name="primaryIncome" value={details.primaryIncome} onChange={handleChange} />
+      <form onSubmit={handleSubmit} className="details-form">
+        {/* ====== Age & Goals ====== */}
+        <div className="section-card">
+          <h2>🧍 Personal Info</h2>
+          <label>Age</label>
+          <input
+            type="number"
+            name="age"
+            value={details.age}
+            onChange={handleChange}
+            placeholder="Enter your age"
+          />
 
-        <label>Side Hustles & Projects</label>
-        <input type="number" name="secondaryIncome" value={details.secondaryIncome} onChange={handleChange} />
+          <label>Short Term Goals</label>
+          <input
+            type="text"
+            name="shortTermGoals"
+            value={details.shortTermGoals}
+            onChange={handleChange}
+            placeholder="e.g. Buy a car, travel fund"
+          />
 
-        <label>Investment / Rental Income</label>
-        <input type="number" name="investmentIncome" value={details.investmentIncome} onChange={handleChange} />
-
-        <label>Other Income Sources</label>
-        <input type="text" name="otherIncomeSources" value={details.otherIncomeSources} onChange={handleChange} />
-
-        {/* ===== Expenses Section ===== */}
-        <h2>💸 Expenses</h2>
-        <label>Living Expenses</label>
-        <input type="number" name="livingExpenses" value={details.livingExpenses} onChange={handleChange} />
-
-        <label>Transport & Commute</label>
-        <input type="number" name="transportExpenses" value={details.transportExpenses} onChange={handleChange} />
-
-        <label>Entertainment & Leisure</label>
-        <input type="number" name="entertainmentExpenses" value={details.entertainmentExpenses} onChange={handleChange} />
-
-        <label>Education / Training</label>
-        <input type="number" name="educationOrTraining" value={details.educationOrTraining} onChange={handleChange} />
-
-        <label>Other Expenses</label>
-        <input type="number" name="otherExpenses" value={details.otherExpenses} onChange={handleChange} />
-
-        {/* ===== Assets & Liabilities ===== */}
-        <div style={{ display: "flex", gap: "2rem", marginTop: "2rem" }}>
-          {/* ===== Assets ===== */}
-          <div style={{ flex: 1 }}>
-            <h2>💰 Assets</h2>
-            {details.assets.map((asset, index) => (
-              <div key={index} style={{ marginBottom: "1rem" }}>
-                <input
-                  type="text"
-                  placeholder="Product"
-                  value={asset.product}
-                  onChange={(e) =>
-                    handleNestedChange(index, "assets", "product", e.target.value)
-                  }
-                  style={{ width: "30%", marginRight: "1rem" }}
-                />
-                <input
-                  type="number"
-                  placeholder="Buying Price"
-                  value={asset.buyingPrice}
-                  onChange={(e) =>
-                    handleNestedChange(index, "assets", "buyingPrice", e.target.value)
-                  }
-                  style={{ width: "30%", marginRight: "1rem" }}
-                />
-                <input
-                  type="number"
-                  placeholder="Years Old"
-                  value={asset.yearsOld}
-                  onChange={(e) =>
-                    handleNestedChange(index, "assets", "yearsOld", e.target.value)
-                  }
-                  style={{ width: "30%" }}
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              className="cta-btn"
-              onClick={() => addField("assets")}
-            >
-              + Add Asset
-            </button>
-          </div>
-
-          {/* ===== Liabilities ===== */}
-          <div style={{ flex: 1 }}>
-            <h2>💳 Liabilities</h2>
-            {details.liabilities.map((liab, index) => (
-              <div key={index} style={{ marginBottom: "1rem" }}>
-                <input
-                  type="text"
-                  placeholder="Liability"
-                  value={liab.product}
-                  onChange={(e) =>
-                    handleNestedChange(index, "liabilities", "product", e.target.value)
-                  }
-                  style={{ width: "50%", marginRight: "1rem" }}
-                />
-                <input
-                  type="number"
-                  placeholder="Amount"
-                  value={liab.amount}
-                  onChange={(e) =>
-                    handleNestedChange(index, "liabilities", "amount", e.target.value)
-                  }
-                  style={{ width: "40%" }}
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              className="cta-btn"
-              onClick={() => addField("liabilities")}
-            >
-              + Add Liability
-            </button>
-          </div>
+          <label>Long Term Goals</label>
+          <input
+            type="text"
+            name="longTermGoals"
+            value={details.longTermGoals}
+            onChange={handleChange}
+            placeholder="e.g. Retirement, house purchase"
+          />
         </div>
 
-        {/* ===== Submit ===== */}
-        <button className="cta-btn" type="submit" style={{ marginTop: "2rem" }}>
+        {/* ====== Income Section ====== */}
+        <div className="section-card">
+          <h2>🏦 Income</h2>
+          <label>Primary Income (Salary / Business)</label>
+          <input
+            type="number"
+            name="primaryIncome"
+            value={details.primaryIncome}
+            onChange={handleChange}
+          />
+
+          <label>Side Hustles & Projects</label>
+          <input
+            type="number"
+            name="secondaryIncome"
+            value={details.secondaryIncome}
+            onChange={handleChange}
+          />
+
+          <label>Investment / Rental Income</label>
+          <input
+            type="number"
+            name="investmentIncome"
+            value={details.investmentIncome}
+            onChange={handleChange}
+          />
+
+          <label>Other Income Sources (Describe)</label>
+          <input
+            type="text"
+            name="otherIncomeSources"
+            value={details.otherIncomeSources}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* ====== Expense Section ====== */}
+        <div className="section-card">
+          <h2>💸 Expenses</h2>
+          <label>Living Expenses (Rent, Food, etc.)</label>
+          <input
+            type="number"
+            name="livingExpenses"
+            value={details.livingExpenses}
+            onChange={handleChange}
+          />
+
+          <label>Transport & Commute</label>
+          <input
+            type="number"
+            name="transportExpenses"
+            value={details.transportExpenses}
+            onChange={handleChange}
+          />
+
+          <label>Entertainment & Leisure</label>
+          <input
+            type="number"
+            name="entertainmentExpenses"
+            value={details.entertainmentExpenses}
+            onChange={handleChange}
+          />
+
+          <label>Education / Training</label>
+          <input
+            type="number"
+            name="educationOrTraining"
+            value={details.educationOrTraining}
+            onChange={handleChange}
+          />
+
+          <label>Other Expenses</label>
+          <input
+            type="number"
+            name="otherExpenses"
+            value={details.otherExpenses}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* ====== Assets ====== */}
+        <div className="section-card">
+          <h2>💰 Assets</h2>
+          <div className="dual-form">
+            <input
+              type="text"
+              placeholder="Asset Name"
+              value={asset.name}
+              onChange={(e) => setAsset({ ...asset, name: e.target.value })}
+            />
+            <input
+              type="number"
+              placeholder="Buying Price"
+              value={asset.buyingPrice}
+              onChange={(e) => setAsset({ ...asset, buyingPrice: e.target.value })}
+            />
+            <input
+              type="number"
+              placeholder="Years Old"
+              value={asset.yearsOld}
+              onChange={(e) => setAsset({ ...asset, yearsOld: e.target.value })}
+            />
+            <button type="button" onClick={handleAddAsset}>
+              Add
+            </button>
+          </div>
+
+          <ul>
+            {assets.map((a, i) => (
+              <li key={i}>
+                {a.name} — ₹{a.buyingPrice} ({a.yearsOld} yrs)
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ====== Liabilities ====== */}
+        <div className="section-card">
+          <h2>💳 Liabilities</h2>
+          <div className="dual-form">
+            <input
+              type="text"
+              placeholder="Liability Name"
+              value={liability.name}
+              onChange={(e) => setLiability({ ...liability, name: e.target.value })}
+            />
+            <input
+              type="number"
+              placeholder="Amount"
+              value={liability.amount}
+              onChange={(e) => setLiability({ ...liability, amount: e.target.value })}
+            />
+            <button type="button" onClick={handleAddLiability}>
+              Add
+            </button>
+          </div>
+
+          <ul>
+            {liabilities.map((l, i) => (
+              <li key={i}>
+                {l.name} — ₹{l.amount}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ====== Submit ====== */}
+        <button type="submit" className="cta-btn">
           Save Details
         </button>
       </form>
