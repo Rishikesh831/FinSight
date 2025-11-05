@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import "./QuadrantPage.css";
 
 export default function QuadrantPage() {
-  const [data, setData] = useState({
-    income: 12000,
-    expense: 7000,
-    assets: 23000.75,
-    liabilities: 8000.5,
-    net: 0,
-    weightedNet: 0,
+    const [data, setData] = useState({
+        income: 12000,
+        expense: 7000,
+        assets: 23000.75,
+        liabilities: 8000.5,
+        net: 0,
+        weightedNet: 0,
   });
 
   useEffect(() => {
