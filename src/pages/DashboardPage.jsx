@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import "./DashboardPage.css";
+import DashboardLayout from "../components/layout/DashboardLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import {
   LineChart,
   Line,
@@ -16,6 +17,7 @@ import {
   ResponsiveContainer,
   Sankey,
 } from "recharts";
+import { ArrowUpRight, ArrowDownRight, DollarSign, Wallet, TrendingUp } from "lucide-react";
 
 // === Mock Data ===
 const data = [
@@ -35,9 +37,8 @@ const pieData = [
   { name: "Leisure", value: 100 },
 ];
 
-const COLORS = ["#00C49F", "#FFBB28", "#FF8042", "#0088FE"];
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
-// === Enhanced Sankey Data ===
 const sankeyData = {
   nodes: [
     { name: "Salary" },
@@ -56,14 +57,37 @@ const sankeyData = {
     { source: 0, target: 5, value: 400 },
     { source: 0, target: 6, value: 600 },
     { source: 0, target: 7, value: 1200 },
-
     { source: 1, target: 4, value: 400 },
     { source: 1, target: 7, value: 600 },
-
     { source: 2, target: 8, value: 1000 },
     { source: 2, target: 7, value: 800 },
   ],
 };
+
+const StatCard = ({ title, value, trend, trendValue, icon: Icon, colorClass }) => (
+  <Card>
+    <div className="flex items-start justify-between">
+      <div>
+        <p className="text-sm font-medium text-text-muted">{title}</p>
+        <h3 className="text-2xl font-bold mt-2 text-text-main">{value}</h3>
+      </div>
+      <div className={`p-3 rounded-xl bg-white/5 ${colorClass}`}>
+        <Icon size={20} />
+      </div>
+    </div>
+    <div className="mt-4 flex items-center gap-2">
+      {trend === "up" ? (
+        <ArrowUpRight size={16} className="text-success" />
+      ) : (
+        <ArrowDownRight size={16} className="text-danger" />
+      )}
+      <span className={trend === "up" ? "text-success text-sm" : "text-danger text-sm"}>
+        {trendValue}
+      </span>
+      <span className="text-text-muted text-sm">vs last month</span>
+    </div>
+  </Card>
+);
 
 const DashboardPage = () => {
   const avgIncome = useMemo(
@@ -76,7 +100,6 @@ const DashboardPage = () => {
   );
   const netFlow = avgIncome - avgExpense;
 
-  // ✅ Proper cumulative computation
   let runningTotal = 0;
   const cumulativeData = data.map((d) => {
     runningTotal += d.income - d.expense;
@@ -84,116 +107,165 @@ const DashboardPage = () => {
   });
 
   return (
-    <div className="dashboard-container">
-      {/* === Summary Cards === */}
-      <div className="cards-section">
-        <div className="card">
-          <h2>Monthly Income</h2>
-          <p>${avgIncome.toFixed(0)}</p>
+    <DashboardLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold text-text-main">Financial Overview</h1>
+          <p className="text-text-muted mt-2">Welcome back! Here's your financial health report.</p>
         </div>
-        <div className="card">
-          <h2>Expenses</h2>
-          <p>${avgExpense.toFixed(0)}</p>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatCard
+            title="Monthly Income"
+            value={`$${avgIncome.toFixed(0)}`}
+            trend="up"
+            trendValue="+12.5%"
+            icon={DollarSign}
+            colorClass="text-success"
+          />
+          <StatCard
+            title="Total Expenses"
+            value={`$${avgExpense.toFixed(0)}`}
+            trend="down"
+            trendValue="-2.4%"
+            icon={Wallet}
+            colorClass="text-danger"
+          />
+          <StatCard
+            title="Net Savings"
+            value={`$${netFlow.toFixed(0)}`}
+            trend="up"
+            trendValue="+8.2%"
+            icon={TrendingUp}
+            colorClass="text-primary"
+          />
         </div>
-        <div className="card">
-          <h2>Savings</h2>
-          <p>${netFlow.toFixed(0)}</p>
+
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="col-span-1 lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Income vs Expense Analysis</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                    <XAxis dataKey="name" stroke="#94a3b8" axisLine={false} tickLine={false} dy={10} />
+                    <YAxis stroke="#94a3b8" axisLine={false} tickLine={false} dx={-10} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                      itemStyle={{ color: '#f8fafc' }}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="income" stroke="#10b981" strokeWidth={3} dot={{ r: 4, fill: "#1e293b", strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                    <Line type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, fill: "#1e293b", strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Expense Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={index} fill={COLORS[index % COLORS.length]} stroke="rgba(0,0,0,0)" />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                      itemStyle={{ color: '#f8fafc' }}
+                    />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Cumulative Wealth Growth</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={cumulativeData}>
+                    <defs>
+                      <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                    <XAxis dataKey="name" stroke="#94a3b8" axisLine={false} tickLine={false} dy={10} />
+                    <YAxis stroke="#94a3b8" axisLine={false} tickLine={false} dx={-10} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                      itemStyle={{ color: '#f8fafc' }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="total"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                      fillOpacity={1}
+                      fill="url(#colorTotal)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="col-span-1 lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Cash Flow Distribution</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <Sankey
+                    data={sankeyData}
+                    nodePadding={50}
+                    nodeWidth={20}
+                    linkCurvature={0.5}
+                    link={{ stroke: '#3b82f6', strokeOpacity: 0.2 }}
+                    node={{
+                      stroke: 'transparent',
+                      fill: '#3b82f6',
+                      width: 20,
+                    }}
+                  >
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
+                      itemStyle={{ color: '#f8fafc' }}
+                    />
+                  </Sankey>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      {/* === Charts Section === */}
-      <div className="charts-grid">
-        {/* 1️⃣ Income vs Expense */}
-        <div className="chart-card">
-          <h3>Income vs Expense</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="income" stroke="#00C49F" />
-              <Line type="monotone" dataKey="expense" stroke="#FF8042" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* 2️⃣ Expense Breakdown */}
-        <div className="chart-card">
-          <h3>Expense Breakdown</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                label
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* 3️⃣ Cumulative Cash Flow */}
-        <div className="chart-card">
-          <h3>Cumulative Cash Flow</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={cumulativeData}>
-              <defs>
-                <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#00C49F" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#00C49F" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Area
-                type="monotone"
-                dataKey="total"
-                stroke="#00C49F"
-                fillOpacity={1}
-                fill="url(#colorTotal)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* 4️⃣ Sankey Flow */}
-        <div className="chart-card">
-          <h3>Cash Flow Distribution</h3>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "0 20px" }}>
-            <p style={{ color: "#888", fontSize: "0.9rem" }}>Income Sources</p>
-            <p style={{ color: "#888", fontSize: "0.9rem" }}>Expenses & Savings</p>
-          </div>
-          <ResponsiveContainer width="100%" height={350}>
-            <Sankey
-              data={sankeyData}
-              nodePadding={40}
-              nodeWidth={15}
-              linkCurvature={0.5}
-              link={{ strokeOpacity: 0.3 }}
-              node={{
-                stroke: "#1e293b",
-                fill: "#06b6d4",
-                strokeWidth: 1.5,
-              }}
-            >
-              <Tooltip />
-            </Sankey>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 };
 

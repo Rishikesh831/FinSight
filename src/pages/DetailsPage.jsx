@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import "./DetailsPage.css";
+import DashboardLayout from "../components/layout/DashboardLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
+import { Input, Label } from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { Plus, Trash2, Save } from "lucide-react";
 
 export default function DetailsPage() {
   const [details, setDetails] = useState({
@@ -48,193 +52,182 @@ export default function DetailsPage() {
   };
 
   return (
-    <section className="details-section">
-      <h1>💼 Your Financial Details</h1>
-      <p>Let’s personalize your profile with your income, expenses, and holdings.</p>
-
-      <form onSubmit={handleSubmit} className="details-form">
-        {/* ====== Age & Goals ====== */}
-        <div className="section-card">
-          <h2>🧍 Personal Info</h2>
-          <label>Age</label>
-          <input
-            type="number"
-            name="age"
-            value={details.age}
-            onChange={handleChange}
-            placeholder="Enter your age"
-          />
-
-          <label>Short Term Goals</label>
-          <input
-            type="text"
-            name="shortTermGoals"
-            value={details.shortTermGoals}
-            onChange={handleChange}
-            placeholder="e.g. Buy a car, travel fund"
-          />
-
-          <label>Long Term Goals</label>
-          <input
-            type="text"
-            name="longTermGoals"
-            value={details.longTermGoals}
-            onChange={handleChange}
-            placeholder="e.g. Retirement, house purchase"
-          />
+    <DashboardLayout>
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-text-main">Financial Profile</h1>
+          <p className="text-text-muted mt-2">Update your personal details, income sources, and assets.</p>
         </div>
 
-        {/* ====== Income Section ====== */}
-        <div className="section-card">
-          <h2>🏦 Income</h2>
-          <label>Primary Income (Salary / Business)</label>
-          <input
-            type="number"
-            name="primaryIncome"
-            value={details.primaryIncome}
-            onChange={handleChange}
-          />
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Personal Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-2 gap-6">
+              <div>
+                <Label>Age</Label>
+                <Input
+                  type="number"
+                  name="age"
+                  value={details.age}
+                  onChange={handleChange}
+                  placeholder="e.g. 28"
+                />
+              </div>
+              <div className="md:col-span-2 grid md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Short Term Goals</Label>
+                  <Input
+                    name="shortTermGoals"
+                    value={details.shortTermGoals}
+                    onChange={handleChange}
+                    placeholder="e.g. Buy a car"
+                  />
+                </div>
+                <div>
+                  <Label>Long Term Goals</Label>
+                  <Input
+                    name="longTermGoals"
+                    value={details.longTermGoals}
+                    onChange={handleChange}
+                    placeholder="e.g. Retirement"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          <label>Side Hustles & Projects</label>
-          <input
-            type="number"
-            name="secondaryIncome"
-            value={details.secondaryIncome}
-            onChange={handleChange}
-          />
+          {/* Income & Expenses Grid */}
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-success">Income Sources</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Primary Income</Label>
+                  <Input
+                    type="number"
+                    name="primaryIncome"
+                    value={details.primaryIncome}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label>Side Hustles</Label>
+                  <Input
+                    type="number"
+                    name="secondaryIncome"
+                    value={details.secondaryIncome}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label>Investments</Label>
+                  <Input
+                    type="number"
+                    name="investmentIncome"
+                    value={details.investmentIncome}
+                    onChange={handleChange}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
-          <label>Investment / Rental Income</label>
-          <input
-            type="number"
-            name="investmentIncome"
-            value={details.investmentIncome}
-            onChange={handleChange}
-          />
-
-          <label>Other Income Sources (Describe)</label>
-          <input
-            type="text"
-            name="otherIncomeSources"
-            value={details.otherIncomeSources}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* ====== Expense Section ====== */}
-        <div className="section-card">
-          <h2>💸 Expenses</h2>
-          <label>Living Expenses (Rent, Food, etc.)</label>
-          <input
-            type="number"
-            name="livingExpenses"
-            value={details.livingExpenses}
-            onChange={handleChange}
-          />
-
-          <label>Transport & Commute</label>
-          <input
-            type="number"
-            name="transportExpenses"
-            value={details.transportExpenses}
-            onChange={handleChange}
-          />
-
-          <label>Entertainment & Leisure</label>
-          <input
-            type="number"
-            name="entertainmentExpenses"
-            value={details.entertainmentExpenses}
-            onChange={handleChange}
-          />
-
-          <label>Education / Training</label>
-          <input
-            type="number"
-            name="educationOrTraining"
-            value={details.educationOrTraining}
-            onChange={handleChange}
-          />
-
-          <label>Other Expenses</label>
-          <input
-            type="number"
-            name="otherExpenses"
-            value={details.otherExpenses}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* ====== Assets ====== */}
-        <div className="section-card">
-          <h2>💰 Assets</h2>
-          <div className="dual-form">
-            <input
-              type="text"
-              placeholder="Asset Name"
-              value={asset.name}
-              onChange={(e) => setAsset({ ...asset, name: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Buying Price"
-              value={asset.buyingPrice}
-              onChange={(e) => setAsset({ ...asset, buyingPrice: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Years Old"
-              value={asset.yearsOld}
-              onChange={(e) => setAsset({ ...asset, yearsOld: e.target.value })}
-            />
-            <button type="button" onClick={handleAddAsset}>
-              Add
-            </button>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-danger">Monthly Expenses</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>Living (Rent/Food)</Label>
+                  <Input
+                    type="number"
+                    name="livingExpenses"
+                    value={details.livingExpenses}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label>Transport</Label>
+                  <Input
+                    type="number"
+                    name="transportExpenses"
+                    value={details.transportExpenses}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div>
+                  <Label>Entertainment</Label>
+                  <Input
+                    type="number"
+                    name="entertainmentExpenses"
+                    value={details.entertainmentExpenses}
+                    onChange={handleChange}
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          <ul>
-            {assets.map((a, i) => (
-              <li key={i}>
-                {a.name} — ₹{a.buyingPrice} ({a.yearsOld} yrs)
-              </li>
-            ))}
-          </ul>
-        </div>
+          {/* Assets */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-primary">Assets & Holdings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 mb-6 items-end">
+                <div className="flex-1">
+                  <Label>Asset Name</Label>
+                  <Input
+                    value={asset.name}
+                    onChange={(e) => setAsset({ ...asset, name: e.target.value })}
+                    placeholder="e.g. Stock Portfolio"
+                  />
+                </div>
+                <div className="w-32">
+                  <Label>Value</Label>
+                  <Input
+                    type="number"
+                    value={asset.buyingPrice}
+                    onChange={(e) => setAsset({ ...asset, buyingPrice: e.target.value })}
+                    placeholder="0.00"
+                  />
+                </div>
+                <Button type="button" onClick={handleAddAsset} size="icon">
+                  <Plus size={20} />
+                </Button>
+              </div>
 
-        {/* ====== Liabilities ====== */}
-        <div className="section-card">
-          <h2>💳 Liabilities</h2>
-          <div className="dual-form">
-            <input
-              type="text"
-              placeholder="Liability Name"
-              value={liability.name}
-              onChange={(e) => setLiability({ ...liability, name: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Amount"
-              value={liability.amount}
-              onChange={(e) => setLiability({ ...liability, amount: e.target.value })}
-            />
-            <button type="button" onClick={handleAddLiability}>
-              Add
-            </button>
+              <div className="space-y-2">
+                {assets.map((a, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+                    <span className="font-medium">{a.name}</span>
+                    <div className="flex items-center gap-4">
+                      <span className="text-success font-mono">₹{a.buyingPrice}</span>
+                      <button type="button" className="text-text-muted hover:text-danger">
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {assets.length === 0 && (
+                  <p className="text-center text-text-muted py-4">No assets added yet.</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex justify-end pt-4">
+            <Button type="submit" size="lg" className="w-full md:w-auto">
+              <Save className="mr-2 h-4 w-4" />
+              Save Profile
+            </Button>
           </div>
-
-          <ul>
-            {liabilities.map((l, i) => (
-              <li key={i}>
-                {l.name} — ₹{l.amount}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* ====== Submit ====== */}
-        <button type="submit" className="cta-btn">
-          Save Details
-        </button>
-      </form>
-    </section>
+        </form>
+      </div>
+    </DashboardLayout>
   );
 }
